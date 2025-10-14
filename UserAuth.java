@@ -41,6 +41,50 @@ import java.util.Scanner;
             String lastName = scanner.nextLine();
 
             System.out.println(login.returnLoginStatus(success, firstName, lastName));
+            Message messageObj = new Message();
+System.out.println("Welcome to QuickChat.");
+
+int choice;
+do {
+    System.out.println("Choose an option:\n1) Send Message\n2) Show Recently Sent Messages\n3) Quit");
+    choice = scanner.nextInt();
+    scanner.nextLine(); // consume newline
+
+    switch (choice) {
+        case 1:
+            System.out.println("How many messages would you like to send?");
+            int count = scanner.nextInt();
+            scanner.nextLine();
+
+            for (int i = 0; i < count; i++) {
+                System.out.println("Enter recipient number:");
+                String recipient = scanner.nextLine();
+
+                System.out.println("Enter message:");
+                String msg = scanner.nextLine();
+
+                String result = messageObj.sendMessage(recipient, msg);
+                System.out.println(result);
+
+                if (result.equals("Message successfully sent.")) {
+                    System.out.println(messageObj.printMessage());
+                }
+            }
+            System.out.println("Total messages sent: " + messageObj.returnTotalMessages());
+            break;
+
+        case 2:
+            System.out.println("Coming Soon.");
+            break;
+
+        case 3:
+            System.out.println("Exiting...");
+            break;
+
+        default:
+            System.out.println("Invalid option.");
+    }
+} while (choice != 3);
         }
     }
 }
