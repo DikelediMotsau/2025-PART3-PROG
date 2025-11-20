@@ -8,11 +8,14 @@
  * @author deede
  */
 import java.util.Scanner;
- public class UserAuth {
-  
+
+public class UserAuth {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Login login = new Login();
+        Message messageObj = new Message();
+
+        System.out.println("Welcome to QuickChat!");
 
         System.out.print("Enter username: ");
         String username = scanner.nextLine();
@@ -21,9 +24,9 @@ import java.util.Scanner;
         String password = scanner.nextLine();
 
         System.out.print("Enter cell phone number: ");
-        String cellPhone = scanner.nextLine();
+        String cell = scanner.nextLine();
 
-        String registrationMessage = login.registerUser(username, password, cellPhone);
+        String registrationMessage = login.registerUser(username, password, cell);
         System.out.println(registrationMessage);
 
         if (registrationMessage.equals("User successfully registered.")) {
@@ -34,59 +37,50 @@ import java.util.Scanner;
             String loginPassword = scanner.nextLine();
 
             boolean success = login.loginUser(loginUsername, loginPassword);
-            System.out.print("Enter your first name: ");
-            String firstName = scanner.nextLine();
 
-            System.out.print("Enter your last name: ");
-            String lastName = scanner.nextLine();
+            if (success) {
+                System.out.println("Login successful!");
 
-            System.out.println(login.returnLoginStatus(success, firstName, lastName));
-            Message messageObj = new Message();
-System.out.println("Welcome to QuickChat.");
+                System.out.print("Enter your first name: ");
+                String firstName = scanner.nextLine();
 
-int choice;
-do {
-    System.out.println("Choose an option:\n1) Send Message\n2) Show Recently Sent Messages\n3) Quit");
-    choice = scanner.nextInt();
-    scanner.nextLine(); // consume newline
+                System.out.print("Enter your last name: ");
+                String lastName = scanner.nextLine();
 
-    switch (choice) {
-        case 1:
-            System.out.println("How many messages would you like to send?");
-            int count = scanner.nextInt();
-            scanner.nextLine();
+                System.out.println(login.returnLoginStatus(true, firstName, lastName));
 
-            for (int i = 0; i < count; i++) {
-                System.out.println("Enter recipient number:");
-                String recipient = scanner.nextLine();
+                System.out.print("How many messages would you like to send? ");
+                int count = Integer.parseInt(scanner.nextLine());
 
-                System.out.println("Enter message:");
-                String msg = scanner.nextLine();
+                for (int i = 0; i < count; i++) {
+                    System.out.print("Enter recipient number: ");
+                    String recipient = scanner.nextLine();
 
-                String result = messageObj.sendMessage(recipient, msg);
-                System.out.println(result);
+                    System.out.print("Enter your message: ");
+                    String message = scanner.nextLine();
 
-                if (result.equals("Message successfully sent.")) {
-                    System.out.println(messageObj.printMessage());
+                    System.out.print("Enter message flag (sent/stored/disregard): ");
+                    String flag = scanner.nextLine().toLowerCase();
+
+                    String result = messageObj.sendMessage(recipient, message, flag);
+                    System.out.println(result);
+
+                    if (!result.equals("Invalid flag.")) {
+                        System.out.println("\n-- Message Details ---");
+                        System.out.println(messageObj.printMessage());
+                        System.out.println("Total messages sent: " + messageObj.returnTotalMessages());
+                    }
                 }
+
+                System.out.println("\nWould you like to see a full message report? (yes/no)");
+                String showReport = scanner.nextLine().toLowerCase();
+                if (showReport.equals("yes")) {
+                    messageObj.displayReport();
+                }
+
+            } else {
+                System.out.println(login.returnLoginStatus(false, "", ""));
             }
-            System.out.println("Total messages sent: " + messageObj.returnTotalMessages());
-            break;
-
-        case 2:
-            System.out.println("Coming Soon.");
-            break;
-
-        case 3:
-            System.out.println("Exiting...");
-            break;
-
-        default:
-            System.out.println("Invalid option.");
-    }
-} while (choice != 3);
         }
     }
 }
-  
-

@@ -2,11 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-
-/**
- *
- * @author deede
- */
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Message {
@@ -15,12 +11,39 @@ public class Message {
     private String message;
     private static int totalMessages = 0;
 
-    public boolean checkMessageID(String id) {
-        return id.length() <= 10;
-    }
+    public static ArrayList<String> sentMessages = new ArrayList<>();
+    public static ArrayList<String> disregardedMessages = new ArrayList<>();
+    public static ArrayList<String> storedMessages = new ArrayList<>();
+    public static ArrayList<String> messageHashes = new ArrayList<>();
+    public static ArrayList<String> messageIDs = new ArrayList<>();
 
     public boolean checkRecipientCell(String cell) {
         return cell.matches("^\\+\\d{1,3}\\d{7,10}$");
+    }
+
+    public String sendMessage(String recipient, String message, String flag) {
+        this.recipient = recipient;
+        this.message = message;
+        this.messageID = generateMessageID();
+        totalMessages++;
+
+        String hash = createMessageHash();
+        messageHashes.add(hash);
+        messageIDs.add(messageID);
+
+        switch (flag.toLowerCase()) {
+            case "sent":
+                sentMessages.add("Sender: You | Recipient: " + recipient + " | Message: " + message);
+                return "Message successfully sent.";
+            case "stored":
+                storedMessages.add("Sender: You | Recipient: " + recipient + " | Message: " + message);
+                return "Message stored.";
+            case "disregard":
+                disregardedMessages.add("Sender: You | Recipient: " + recipient + " | Message: " + message);
+                return "Message disregarded.";
+            default:
+                return "Invalid flag.";
+        }
     }
 
     public String createMessageHash() {
@@ -29,20 +52,13 @@ public class Message {
         return (firstTwo + ":" + lastTwo + ":" + message.toUpperCase()).toUpperCase();
     }
 
-    public String sendMessage(String recipient, String message) {
-        if (!checkRecipientCell(recipient)) {
-            return "Cell phone number is incorrectly formatted or does not contain an international code.";
+    public String generateMessageID() {
+        Random rand = new Random();
+        StringBuilder id = new StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            id.append(rand.nextInt(10));
         }
-        if (message.length() > 250) {
-            return "Message exceeds 250 characters by " + (message.length() - 250) + ", please reduce size.";
-        }
-
-        this.recipient = recipient;
-        this.message = message;
-        this.messageID = generateMessageID();
-        totalMessages++;
-
-        return "Message successfully sent.";
+        return id.toString();
     }
 
     public String printMessage() {
@@ -54,14 +70,67 @@ public class Message {
         return totalMessages;
     }
 
-    private String generateMessageID() {
-        Random rand = new Random();
-        StringBuilder id = new StringBuilder();
-        for (int i = 0; i < 10; i++) {
-            id.append(rand.nextInt(10));
+    public String searchByMessageID(String id) {
+        for (int i = 0; i < messageIDs.size(); i++) {
+            if (messageIDs.get(i).equals(id)) {
+                return sentMessages.get(i);
+            }
         }
-        return id.toString();
+        return "Message ID not found.";
+    }
+
+    public String findLongestSentMessage() {
+        String longest = "";
+        for (String msg : sentMessages) {
+            String content = msg.split("\\|")[2].trim().replace("Message: ", "");
+            if (content.length() > longest.length()) {
+                longest = content;
+            }
+        }
+        return longest;
+    }
+
+    public ArrayList<String> searchMessagesByRecipient(String recipient) {
+        ArrayList<String> results = new ArrayList<>();
+        for (String msg : sentMessages) {
+            if (msg.contains(recipient)) {
+                results.add(msg);
+            }
+        }
+        for (String msg : storedMessages) {
+            if (msg.contains(recipient)) {
+                results.add(msg);
+            }
+        }
+        return results;
+    }
+
+    public boolean deleteMessageByHash(String hash) {
+        for (int i = 0; i < messageHashes.size(); i++) {
+            if (messageHashes.get(i).equals(hash)) {
+                sentMessages.remove(i);
+                messageHashes.remove(i);
+                messageIDs.remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void displayReport() {
+        System.out.println("Sent Messages:");
+        for (String msg : sentMessages) {
+            System.out.println(msg);
+        }
+
+        System.out.println("\nMessage Hashes:");
+        for (String hash : messageHashes) {
+            System.out.println(hash);
+        }
+
+        System.out.println("\nMessage IDs:");
+        for (String id : messageIDs) {
+            System.out.println(id);
+        }
     }
 }
-    
-
